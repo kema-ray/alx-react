@@ -10,4 +10,7 @@ function getFooterCopy(isIndex) {
     }
 }
 
+export const getLatestNotification = () =>
+	'<strong>Urgent Requirement</strong> - complete by EOD';
+
 export { getFullYear, getFooterCopy };
