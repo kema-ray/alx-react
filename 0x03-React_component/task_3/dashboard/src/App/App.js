@@ -7,6 +7,7 @@ import CourseList from '../CourseList/CourseList';
 import PropTypes from 'prop-types';
 import Notifications from '../Notifications/Notifications';
 import { getLatestNotification } from '../utils/utils';
+import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
 
 class App extends React.Component {
 	constructor(props) {
@@ -33,6 +34,7 @@ class App extends React.Component {
 			this.props.logOut();
 		}
 	}
+
 	componentDidMount() {
 		document.addEventListener('keydown', this.handleKeyPress);
 	}
@@ -50,10 +52,22 @@ class App extends React.Component {
 						<Header />
 					</div>
 					{this.props.isLoggedIn ? (
-						<CourseList listCourses={this.listCourses} />
+						<BodySectionWithMarginBottom title='Course list'>
+							<CourseList listCourses={this.listCourses} />
+						</BodySectionWithMarginBottom>
 					) : (
-						<Login />
+						<BodySectionWithMarginBottom title='Log in to continue'>
+							<Login />
+						</BodySectionWithMarginBottom>
 					)}
+					<BodySection title='d'>
+						<p>
+							Lorem ipsum dolor sit amet consectetur adipisicing elit.
+							Perspiciatis at tempora odio, necessitatibus repudiandae
+							reiciendis cum nemo sed asperiores ut molestiae eaque aliquam illo
+							ipsa iste vero dolor voluptates.
+						</p>
+					</BodySection>
 					<Footer />
 				</div>
 			</React.Fragment>
