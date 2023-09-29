@@ -1,5 +1,6 @@
 import { LOGOUT, LOGIN_FAILURE, LOGIN_SUCCESS, HIDE_NOTIFICATION_DRAWER, DISPLAY_NOTIFICATION_DRAWER } from '../actions/uiActionTypes'
 
+
 export const initialState = () => {
     isNotificationDrawerVisible: false
     isUserLoggedIn: false
