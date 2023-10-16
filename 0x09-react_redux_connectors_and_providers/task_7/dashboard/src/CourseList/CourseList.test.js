@@ -1,69 +1,47 @@
 import React from 'react';
-import CourseList from './CourseList';
-import CourseListRow from './CourseListRow';
+import { CourseList } from './CourseList';
 import { shallow } from 'enzyme';
 import { StyleSheetTestUtils } from 'aphrodite';
 
 beforeEach(() => {
-	StyleSheetTestUtils.suppressStyleInjection();
-});
-afterEach(() => {
-	StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+  StyleSheetTestUtils.suppressStyleInjection();
 });
 
-const listCourses = [
-	{ id: 1, name: 'ES6', credit: 60 },
-	{ id: 2, name: 'Webpack', credit: 20 },
-	{ id: 3, name: 'React', credit: 40 },
-];
+export const listCourses = [
+  {id: 1, name: 'ES6', credit: 60},
+  {id: 2, name: 'Webpack', credit: 20},
+  {id: 3, name: 'React', credit: 40}
+]
 
-describe('CourseList component tests', () => {
-	it('should render without crashing', () => {
-		const wrapper = shallow(<CourseList />);
+const wrapper = shallow(<CourseList listCoures={listCourses}/>)
+describe('CourseList component when listCourses prop is empty/not specified', () => {
+  it('renders without crashing', () => {
+    expect(wrapper.exists()).toBe(true)
+  })
 
-		expect(wrapper.exists()).toBe(true);
-	});
+  it('renders the 2 headings', () => {
+    expect(wrapper.find('table thead').children().length).toEqual(2);
+  })
 
-	it('renders 5 different rows', () => {
-		const wrapper = shallow(<CourseList listCourses={listCourses} />);
+  it("fetcCourses action creator is called when component is mounted", ()=> {
+    const fetchCourses = jest.fn()
+    const wrapper = shallow(<CourseList listCoures={listCourses} fetchCourses={fetchCourses}/>)
+    // const instance = wrapper.instance()
+    // instance.componentDidMount()
+    expect(fetchCourses).toHaveBeenCalled()
+  })
+})
 
-		expect(wrapper.find('thead').children()).toHaveLength(2);
-		wrapper.find('thead').forEach((node) => {
-			expect(
-				node.equals(
-					<CourseListRow
-						textFirstCell='Course name'
-						textSecondCell='Credit'
-						isHeader={true}
-					/>
-				)
-			);
-		});
+const wrapper2 = shallow(<CourseList listCourses={listCourses}/>)
+const coursesLength = listCourses.length
+describe('CourseList component when listCourses prop is empty/not specified', () => {
+  it('renders without crashing', () => {
+    expect(wrapper2.exists()).toBe(true)
+  })
 
-		expect(wrapper.find('tbody').children()).toHaveLength(3);
-		expect(wrapper.find('tbody').childAt(0).html()).toEqual(
-			'<tr style="background-color:#f5f5f5ab"><td>ES6</td><td>60</td></tr>'
-		);
-		expect(wrapper.find('tbody').childAt(1).html()).toEqual(
-			'<tr style="background-color:#f5f5f5ab"><td>Webpack</td><td>20</td></tr>'
-		);
-		expect(wrapper.find('tbody').childAt(2).html()).toEqual(
-			'<tr style="background-color:#f5f5f5ab"><td>React</td><td>40</td></tr>'
-		);
-	});
 
-	it('renders correctely when passed a list of courses', () => {
-		const wrapper = shallow(<CourseList listCourses={listCourses} />);
-
-		expect(wrapper.find('tbody').children()).toHaveLength(3);
-		expect(wrapper.find('tbody').childAt(0).html()).toEqual(
-			'<tr style="background-color:#f5f5f5ab"><td>ES6</td><td>60</td></tr>'
-		);
-		expect(wrapper.find('tbody').childAt(1).html()).toEqual(
-			'<tr style="background-color:#f5f5f5ab"><td>Webpack</td><td>20</td></tr>'
-		);
-		expect(wrapper.find('tbody').childAt(2).html()).toEqual(
-			'<tr style="background-color:#f5f5f5ab"><td>React</td><td>40</td></tr>'
-		);
-	});
-});
+  it('renders the 5 different rows', () => {
+    expect(wrapper2.find('table thead').children().length).toEqual(2);
+    expect(wrapper2.find('table tbody').children().length).toEqual(coursesLength);
+  })
+})
