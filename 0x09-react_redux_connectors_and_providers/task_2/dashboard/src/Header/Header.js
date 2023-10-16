@@ -1,13 +1,15 @@
-import holbertonLogo from '../assets/holberton_logo.jpg';
 import React, {useContext} from 'react';
 import { StyleSheet, css } from 'aphrodite';
-import { AppContext } from '../App/AppContext';
-
+import logo from '../assets/hbnblogo.jpg';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { logout } from '../actions/uiActionCreators';
 
 const styles = StyleSheet.create({
   header: {
     display: "flex",
     alignItems: "center",
+    borderBottom: "4px solid #E0354B",
     marginBottom: 60
   },
   
@@ -28,29 +30,54 @@ const styles = StyleSheet.create({
 
 })
 
-export default class Header extends React.Component {
-  // static contextType = AppContext
+export class Header extends React.Component {
   render() {
-    const data = this.context
-    const email = data.currentUser.email
+    const {user} = this.props
     const displayText = () => {
-      if (data.currentUser.isLoggedIn){
+      if (this.props.isLoggedIn){
         return (
-        <section id="logoutSection">Welcome {email}
-          <span  className={css(styles.logOut)} onClick={data.logOut}>(logout)</span>
+        <section id="logoutSection">Welcome {user.email} 
+          <a  className={css(styles.logOut)} onClick={this.props.logOut}> (logout)</a>
         </section>
         )
       }
     }
     return (
-      <React.Fragment>
+      <>
       <div className={css(styles.header)}>
-        <img className={css(styles.img)} src={holbertonLogo} alt="logo"/>
+        <img className={css(styles.img)} src={logo} alt="logo"/>
         <h1 className={css(styles.heading)}>School dashboard</h1>
       </div>
       {displayText()}
-      </React.Fragment>
+      </>
     )
   }
 }
-Header.contextType = AppContext
+
+const mapStateToProps = (state) => {
+  const user = state.get("user")
+  const isLoggedIn = state.get("isUserLoggedIn")
+  return { user, isLoggedIn }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {logOut: () => dispatch(logout())}
+}
+
+Header.propTypes = {
+  user: PropTypes.shape({
+    email: PropTypes.string,
+    password: PropTypes.string,
+  }),
+  isLoggedIn: PropTypes.bool
+}
+
+Header.defaultProps = {
+    user: {
+      email: "",
+      password: ""
+    },
+    isLoggedIn: false
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header)
