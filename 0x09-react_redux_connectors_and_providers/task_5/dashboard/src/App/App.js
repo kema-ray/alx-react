@@ -66,10 +66,10 @@ export class App extends React.Component {
     this.setState({user: currentUser })
   }
 
-  markNotificationAsRead = (id) => {
-    const Notifications = this.state.listNotifications
-    this.setState({listNotifications: Notifications.filter((notif)=> id != notif.id )})
-  }
+  // markNotificationAsRead = (id) => {
+  //   const Notifications = this.state.listNotifications
+  //   this.setState({listNotifications: Notifications.filter((notif)=> id != notif.id )})
+  // }
 
   componentDidMount() {
     this.alert()
@@ -114,7 +114,7 @@ export class App extends React.Component {
   return (
     <AppContext.Provider value={{currentUser, logOut}}>
       <Notifications displayDrawer={this.props.displayDrawer} showDrawer={showDrawer} hideDrawer={hideDrawer}
-      listNotifications={this.state.listNotifications} markNotificationAsRead={this.markNotificationAsRead}/>
+      listNotifications={this.state.listNotifications}/>
       <Header/>
       <div className={css(styles.AppBody)}>
         {LoginStatus()}
