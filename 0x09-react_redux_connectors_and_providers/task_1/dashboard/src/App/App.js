@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getLatestNotification } from '../utils/utils';
 import { StyleSheet, css} from 'aphrodite';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
@@ -9,49 +8,55 @@ import Notifications from '../Notifications/Notifications';
 import CourseList from '../CourseList/CourseList';
 import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBottom';
 import BodySection from '../BodySection/BodySection';
-import { AppContext, user } from './AppContext';
+import {AppContext, defaultUser } from './AppContext'
 import { connect } from 'react-redux';
+import { displayNotificationDrawer, hideNotificationDrawer } from '../actions/uiActionCreators';
+
 
 const styles = StyleSheet.create({
   AppBody: {
     fontSize: '1.1rem',
     paddingLeft: 10,
     margin: 0,
-  },
-  wrapper: {
-    border: '2px solid #e1484c'
+    minHeight: 350
   }
 })
 
-// const listNotifications = [
-//   { id: 1, value: 'New course available', type: 'default' },
-//   { id: 2, value: 'New resume available', type: 'urgent' },
-//   { id: 3, html: { __html: getLatestNotification }, type: 'urgent' }
-// ]
 
-const listCourses = [
-  { id: 1, name: 'ES6', credit: 60 },
-  { id: 2, name: 'Webpack', credit: 20 },
-  { id: 3, name: 'React', credit: 40 }
-];
-
-export default class App extends React.Component {
+export class App extends React.Component {
   constructor(props){
-    super(props);
+    super(props)
     this.state = {
-      displayDrawer: false,
-      user: user,
-      listCourses: listCourses,
+      user: defaultUser,
+      listCourses: [
+        {id: 1, name: 'ES6', credit: 60},
+        {id: 2, name: 'Webpack', credit: 20},
+        {id: 3, name: 'React', credit: 40}
+      ],
       listNotifications: [
-        { id: 1, value: 'New course available', type: 'default' },
-        { id: 2, value: 'New resume available', type: 'urgent' },
-        { id: 3, html: { __html: getLatestNotification() }, type: 'urgent' }
+        {id: 1, type:"default", value: "New course available", html:{__html:null}},
+        {id: 2, type:"urgent", html:{__html:"Object Oriented Programming intro"}},
+        {id: 3, type:"default", value: "Present Javascript project requirements test on Friday"}
       ]
     }
   }
 
+  static propTypes = {
+    isLoggedIn: PropTypes.bool,
+    displayDrawer: PropTypes.bool,
+    displayNotificationDrawer: PropTypes.func,
+    hideNotificationDrawer: PropTypes.func
+  }
+
+  static defaultProps = {
+      isLoggedIn: false,
+      displayDrawer: false,
+      displayNotificationDrawer: () => {},
+      hideNotificationDrawer: () => {}
+  }
+
   logOut = () => {
-    this.setState({user: user})
+    this.setState({user: defaultUser})
   }
 
   logIn = (email, password) => {
@@ -59,12 +64,9 @@ export default class App extends React.Component {
     this.setState({user: currentUser })
   }
 
-  handleDisplayDrawer = () => {
-    this.setState({displayDrawer: true})
-  }
-
-  handleHideDrawer = () => {
-    this.setState({displayDrawer: false})
+  markNotificationAsRead = (id) => {
+    const Notifications = this.state.listNotifications
+    this.setState({listNotifications: Notifications.filter((notif)=> id != notif.id )})
   }
 
   componentDidMount() {
@@ -85,14 +87,12 @@ export default class App extends React.Component {
     window.removeEventListener('keydown', alert)
   }
 
-  markNotificationAsRead(id) {
-    const Notifications = this.state.listNotifications
-    this.setState({listNotifications: Notifications.filter((notif)=> id != notif.id )})
-  }
-
   render () {
     const currentUser = this.state.user
     const logOut = this.logOut
+    const displayDrawerState = this.state.displayDrawer;
+    const showDrawer = this.props.displayNotificationDrawer;
+    const hideDrawer = this.props.hideNotificationDrawer;
     const LoginStatus = () => {
       if (currentUser.isLoggedIn) {
         return (
@@ -111,32 +111,35 @@ export default class App extends React.Component {
   }
   return (
     <AppContext.Provider value={{currentUser, logOut}}>
-      <>
-        <Notifications
-              listNotifications={this.state.listNotifications}
-              displayDrawer={this.state.displayDrawer}
-              handleDisplayDrawer={this.handleDisplayDrawer} handleHideDrawer={this.handleHideDrawer}
-              markNotificationAsRead={this.markNotificationAsRead}
-            />
-        <Header />
-        <hr className={css(styles.wrapper)}/>
-        <div className={css(styles.AppBody)}>
-          {LoginStatus()}
-          <BodySection title="News from the School">
-            <p>
-              News from the school.
-            </p>
-          </BodySection>
-        </div>
-        <Footer />
-      </>
+      <Notifications displayDrawer={this.props.displayDrawer} showDrawer={showDrawer} hideDrawer={hideDrawer}
+      listNotifications={this.state.listNotifications} markNotificationAsRead={this.markNotificationAsRead}/>
+      <Header/>
+      <div className={css(styles.AppBody)}>
+        {LoginStatus()}
+        <BodySection title="News from the School">
+          <p>
+            News around the school!
+          </p>
+        </BodySection>
+      </div>
+      <Footer />
     </AppContext.Provider>
   );
   }
 }
 
 export const mapStateToProps = (state) => {
-  return { isLoggedIn: state.get("isUserLoggedIn")}
+  return { 
+    isLoggedIn: state.get("isUserLoggedIn"),
+    displayDrawer: state.get("isNotificationDrawerVisible") 
+  }
 }
 
-connect(mapStateToProps)(App)
+export const mapDispatchToProps = (dispatch) => {
+  return {
+    displayNotificationDrawer: () => dispatch(displayNotificationDrawer()),
+    hideNotificationDrawer: () => dispatch(hideNotificationDrawer())
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App)
+// export default App
