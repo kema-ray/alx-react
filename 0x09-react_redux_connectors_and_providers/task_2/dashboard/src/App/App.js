@@ -10,7 +10,7 @@ import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBot
 import BodySection from '../BodySection/BodySection';
 import {AppContext, defaultUser } from './AppContext'
 import { connect } from 'react-redux';
-import { displayNotificationDrawer, hideNotificationDrawer } from '../actions/uiActionCreators';
+import { displayNotificationDrawer, hideNotificationDrawer, loginRequest } from '../actions/uiActionCreators';
 
 
 const styles = StyleSheet.create({
@@ -45,14 +45,16 @@ export class App extends React.Component {
     isLoggedIn: PropTypes.bool,
     displayDrawer: PropTypes.bool,
     displayNotificationDrawer: PropTypes.func,
-    hideNotificationDrawer: PropTypes.func
+    hideNotificationDrawer: PropTypes.func,
+    login: PropTypes.func
   }
 
   static defaultProps = {
       isLoggedIn: false,
       displayDrawer: false,
       displayNotificationDrawer: () => {},
-      hideNotificationDrawer: () => {}
+      hideNotificationDrawer: () => {},
+      login: () => {}
   }
 
   logOut = () => {
@@ -94,7 +96,7 @@ export class App extends React.Component {
     const showDrawer = this.props.displayNotificationDrawer;
     const hideDrawer = this.props.hideNotificationDrawer;
     const LoginStatus = () => {
-      if (currentUser.isLoggedIn) {
+      if (this.props.isLoggedIn) {
         return (
           <BodySectionWithMarginBottom title="Course List">
             <CourseList listCourses={this.state.listCourses}/>
@@ -103,7 +105,7 @@ export class App extends React.Component {
       } else {
         return (
           <BodySectionWithMarginBottom title="Log in to continue">
-            <Login logIn={this.logIn}/>
+            <Login logIn={this.props.logIn}/>
           </BodySectionWithMarginBottom>
         )
     }
@@ -138,7 +140,8 @@ export const mapStateToProps = (state) => {
 export const mapDispatchToProps = (dispatch) => {
   return {
     displayNotificationDrawer: () => dispatch(displayNotificationDrawer()),
-    hideNotificationDrawer: () => dispatch(hideNotificationDrawer())
+    hideNotificationDrawer: () => dispatch(hideNotificationDrawer()),
+    login: (email, password) => dispatch(loginRequest(email, password))
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(App)
