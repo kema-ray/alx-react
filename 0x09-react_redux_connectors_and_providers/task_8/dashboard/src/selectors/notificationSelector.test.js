@@ -1,52 +1,30 @@
-import {
-	filterTypeSelected,
-	getNotifications,
-	getUnreadNotifications,
-} from './notificationSelector';
-import { markAsRead } from '../actions/notificationActionCreators';
-import notificationReducer from '../reducers/notificationReducer';
-import { notificationsNormalizer } from '../schema/notifications';
-import { Map } from 'immutable';
+import { Map } from "immutable"
+import { filterTypeSelected, getNotifications, getUnreadNotificationsByType } from "./notificationSelector"
 
-const initialState = Map({
-	notifications: [],
-	filter: 'DEFAULT',
-});
+const state = {
+  notifications: Map({
+    notifications: Map({
+      '1': { id: 1, type: 'default', value: 'New data available', isRead: true },
+      '2': { id: 2, type: 'urgent', value: 'New data available', isRead: false }
+    }),
+    filter:"URGENT"
+  })
+}
 
-const returnState = {
-	filter: 'DEFAULT',
-	notifications: [
-		{
-			id: 1,
-			isRead: false,
-			type: 'default',
-			value: 'New course available',
-		},
-		{
-			id: 2,
-			isRead: false,
-			type: 'urgent',
-			value: 'New resume available',
-		},
-		{
-			id: 3,
-			isRead: false,
-			type: 'urgent',
-			value: 'New data available',
-		},
-	],
-};
+test("selector: filterTypeSelected, returns filter property in state", ()=>{
+  const selectedFilterType = filterTypeSelected(state) 
+  expect(selectedFilterType).toEqual(state.notifications.get("filter"))
+})
 
-describe('tests for notificationSelector', () => {
-	it('returns filter as expected', () => {
-		const filter = filterTypeSelected(initialState);
-		expect(filter).toEqual('DEFAULT');
-	});
+test("selector: selectedNotifications, returns all notifcations present in state", ()=>{
+  const selectedNotifications = getNotifications(state) 
+  expect(selectedNotifications).toEqual(state.notifications.get("notifications"))
+})
 
-	it('returns notifications as expected', () => {
-		const notifications = notificationsNormalizer(returnState);
-		expect(getNotifications(notifications)).toEqual(
-			notifications.notifications
-		);
-	});
-});
+test("reselector: getUnreadNotificationsByType, returns unread urgent notifications when the filter is set to 'URGENT'", ()=>{
+  let expected = [
+    { id: 2, type: 'urgent', value: 'New data available', isRead: false }
+  ]
+  const selectedUnread = getUnreadNotificationsByType(state) 
+  expect(selectedUnread.toJS()).toEqual(expected)
+})
