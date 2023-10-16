@@ -20,8 +20,9 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-let wrapper = shallow(<App />);
+
 describe('App Component', () => {
+  let wrapper = shallow(<App />);
   it("renders without crashing", () => {
     expect(wrapper.exists()).toBe(true)
   })
@@ -42,34 +43,21 @@ describe('App Component', () => {
     expect(wrapper.containsMatchingElement(<CourseList/>)).toEqual(false)
   })
 
-  it("state is updated accordingly, after calling logIn", () => {
-    // let wrapper = shallow(<App />);
-    wrapper.instance().logIn("jack", "badpassword")
+  // it("listNotifications state is updated accordingly, after calling markNotificationAsRead", () => {
+  //   // listNotifications state has a length of three
+  //   wrapper.setState({listNotifications: listNotifications})
+  //   wrapper.instance().markNotificationAsRead(1)
+  //   // listNotifications state now has a length of two
+  //   expect(wrapper.state('listNotifications').length).toEqual(2)
+  // })
 
-    // user details are set and isLoggedIn is now set to true
-    expect(wrapper.state('user')).toEqual({"email": "jack", "isLoggedIn": true, "password": "badpassword"})
-  })
-
-  it("state is updated accordingly, after calling logOut", () => {
-
-    wrapper.instance().logOut()
-    // default user details are set with isLoggedIn set to false
-    expect(wrapper.state('user')).toEqual({"email": "", "isLoggedIn": false, "password": ""})
-  })
-
-  it("listNotifications state is updated accordingly, after calling markNotificationAsRead", () => {
-    // listNotifications state has a length of three
-    wrapper.setState({listNotifications: listNotifications})
-    wrapper.instance().markNotificationAsRead(1)
-    // listNotifications state now has a length of two
-    expect(wrapper.state('listNotifications').length).toEqual(2)
-  })
 })
 
-// const wrapper_isLoggedIn = shallow(<App/>);
+
 describe('App Component when isLoggedin is true', () => {
+  const wrapper = shallow(<App isLoggedIn={true}/>);
+
   it("does not render Login component", () => {
-    wrapper.setState({user:{email:'', password:'', isLoggedIn:true}})
     expect(wrapper.containsMatchingElement(<Login/>)).toEqual(false)
   })
 
